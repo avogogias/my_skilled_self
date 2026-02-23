@@ -1,0 +1,72 @@
+version: "3.9"
+
+# ── My Skilled Self — Docker Compose ──────────────────────────────────────
+# Services:
+#   agent    — FastAPI + Google ADK agent (port 8000)
+#   frontend — React + Vite + Nginx (port 3000)
+#   tests    — Python test runner (runs once and exits)
+#
+# Usage:
+#   docker compose up              — start agent + frontend
+#   docker compose run tests       — run all tests
+#   docker compose up --build      — rebuild images and start
+
+services:
+
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    container_name: my_skilled_self_agent
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,http://localhost:5173
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: my_skilled_self_frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://agent:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      agent:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    container_name: my_skilled_self_tests
+    env_file: .env
+    environment:
+      - AGENT_BASE_URL=http://agent:8000
+    depends_on:
+      agent:
+        condition: service_healthy
+    networks:
+      - app_network
+    profiles:
+      - testing
+
+networks:
+  app_network:
+    driver: bridge
