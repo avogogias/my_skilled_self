@@ -41,7 +41,7 @@ def _build_agent() -> LlmAgent:
 
 _agent: LlmAgent | None = None
 _runner: Runner | None = None
-_session_service = InMemorySessionService()
+_session_service: InMemorySessionService = InMemorySessionService()
 
 
 def get_runner() -> Runner:

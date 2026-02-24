@@ -53,6 +53,10 @@ def compute_rsi(close: list[float], period: int = 14) -> list[Optional[float]]:
     rsi_values: list[Optional[float]] = [None] * period
 
     def _rsi(ag, al):
+        # Both zero means no price movement → neutral midpoint
+        if ag == 0 and al == 0:
+            return 50.0
+        # Only losses, no gains → fully overbought guard against div-by-zero
         if al == 0:
             return 100.0
         rs = ag / al

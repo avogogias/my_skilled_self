@@ -64,7 +64,7 @@ class TestSkillRegistry:
     def test_skills_manifest_structure(self):
         manifest = get_skills_manifest()
         assert isinstance(manifest, list)
-        assert len(manifest) == 2  # trading_advisor + chart_generator
+        assert len(manifest) == 3  # trading_advisor + chart_generator + github_reviewer
         for skill in manifest:
             assert "name" in skill
             assert "description" in skill

@@ -59,12 +59,27 @@ class TestRSI:
         result = compute_rsi([1.0, 2.0, 3.0], 14)
         assert all(v is None for v in result)
 
-    def test_rsi_constant_prices(self):
-        # No change → RSI should handle without error (div by 0 guard)
+    def test_rsi_constant_prices_returns_neutral(self):
+        # No change at all (avg_gain=0, avg_loss=0) → neutral RSI of 50
         prices = [100.0] * 20
         result = compute_rsi(prices, 14)
         valid = [v for v in result if v is not None]
+        # Bug fix: both gain and loss = 0 should return 50.0 (neutral), not 100.0
+        assert all(v == 50.0 for v in valid)
+
+    def test_rsi_only_gains_returns_100(self):
+        # Strictly increasing prices → only gains, no losses → RSI = 100
+        prices = [float(i) for i in range(1, 22)]
+        result = compute_rsi(prices, 14)
+        valid = [v for v in result if v is not None]
         assert all(v == 100.0 for v in valid)
+
+    def test_rsi_only_losses_returns_0(self):
+        # Strictly decreasing prices → only losses, no gains → RSI near 0
+        prices = [float(20 - i) for i in range(21)]
+        result = compute_rsi(prices, 14)
+        valid = [v for v in result if v is not None]
+        assert all(v == 0.0 for v in valid)
 
 
 class TestMACD:

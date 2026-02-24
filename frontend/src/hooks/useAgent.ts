@@ -155,6 +155,8 @@ export function useAgent() {
     sessionIdRef.current = makeId(); // New session
   }, []);
 
+  const clearError = useCallback(() => setError(null), []);
+
   return {
     messages,
     isLoading,
@@ -162,6 +164,7 @@ export function useAgent() {
     sessionId: sessionIdRef.current,
     sendMessage,
     stopStreaming,
+    clearError,
     clearMessages,
   };
 }

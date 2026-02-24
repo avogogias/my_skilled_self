@@ -9,12 +9,14 @@ To add a new skill:
 from typing import Any, Callable
 
 from skills.chart_generator import ChartGeneratorSkill
+from skills.github_reviewer import GitHubReviewerSkill
 from skills.trading_advisor import TradingAdvisorSkill
 
 
 REGISTERED_SKILLS = [
     TradingAdvisorSkill(),
     ChartGeneratorSkill(),
+    GitHubReviewerSkill(),
 ]
 
 

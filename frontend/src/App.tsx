@@ -38,7 +38,7 @@ performance comparisons, sector heat maps, and volume profiles.
 All analysis is for educational purposes and does not constitute financial advice.`;
 
 export default function App() {
-  const { messages, isLoading, error, sendMessage, stopStreaming, clearMessages } =
+  const { messages, isLoading, error, sendMessage, stopStreaming, clearMessages, clearError } =
     useAgent();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -113,7 +113,7 @@ export default function App() {
         {error && (
           <div className="error-banner">
             ⚠️ {error}
-            <button className="error-dismiss" onClick={() => {}}>
+            <button className="error-dismiss" onClick={clearError}>
               ✕
             </button>
           </div>

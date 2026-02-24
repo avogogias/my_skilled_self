@@ -297,9 +297,13 @@ def build_comparison_chart(tickers: str, period: str = "1y") -> dict:
             "line": {"color": colors[idx % len(colors)], "width": 2},
         })
 
+    if not traces:
+        return {"error": "No data available for any of the requested tickers."}
+
+    x_baseline = [traces[0]["x"][0], traces[0]["x"][-1]]
     traces.append({
         "type": "scatter",
-        "x": [traces[0]["x"][0], traces[0]["x"][-1]] if traces else [],
+        "x": x_baseline,
         "y": [0, 0],
         "name": "Baseline (0%)",
         "mode": "lines",

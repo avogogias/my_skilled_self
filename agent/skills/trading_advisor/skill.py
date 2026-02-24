@@ -5,6 +5,8 @@ Skill pattern (HuggingFace-inspired):
   - get_tools()    : returns list of Python functions the ADK agent exposes
 """
 
+import math
+
 from skills.base import BaseSkill, SkillMetadata
 from skills.trading_advisor.data_fetcher import (
     get_financials,
@@ -137,7 +139,9 @@ def tool_compare_stocks(tickers: str, period: str = "1y") -> dict:
     Returns:
         Price performance, returns, volatility comparison for each ticker.
     """
-    ticker_list = [t.strip().upper() for t in tickers.split(",")][:5]  # max 5
+    ticker_list = [t.strip().upper() for t in tickers.split(",") if t.strip()][:5]
+    if not ticker_list:
+        return {"error": "No valid tickers provided.", "tickers": [], "comparison": {}}
     results = {}
 
     for ticker in ticker_list:
@@ -155,8 +159,8 @@ def tool_compare_stocks(tickers: str, period: str = "1y") -> dict:
         daily_rets = [
             (closes[i] - closes[i - 1]) / closes[i - 1]
             for i in range(1, len(closes))
+            if closes[i - 1] != 0
         ]
-        import math
         avg_ret = sum(daily_rets) / len(daily_rets) if daily_rets else 0
         variance = sum((r - avg_ret) ** 2 for r in daily_rets) / len(daily_rets) if daily_rets else 0
         annualised_vol = math.sqrt(variance * 252) * 100

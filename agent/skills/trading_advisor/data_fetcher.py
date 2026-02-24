@@ -5,7 +5,7 @@ making this functionally equivalent to the 'Investopedia trading API'.
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from typing import Any
 
 import pandas as pd
@@ -66,7 +66,7 @@ def get_stock_quote(ticker: str) -> dict:
             "industry": info.get("industry", "N/A"),
             "exchange": info.get("exchange", "N/A"),
             "currency": info.get("currency", "USD"),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
     except Exception as exc:
         return {"error": str(exc), "ticker": ticker.upper()}
@@ -187,7 +187,7 @@ def get_market_overview() -> dict:
         except Exception:
             results[name] = {"symbol": sym, "price": 0, "change": 0, "change_pct": 0}
 
-    return {"indices": results, "timestamp": datetime.utcnow().isoformat()}
+    return {"indices": results, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 
 def get_sector_performance() -> dict:
@@ -230,7 +230,7 @@ def get_sector_performance() -> dict:
         except Exception:
             results[sector] = {"etf": etf, "price": 0, "change_pct_1d": 0}
 
-    return {"sectors": results, "timestamp": datetime.utcnow().isoformat()}
+    return {"sectors": results, "timestamp": datetime.now(timezone.utc).isoformat()}
 
 
 def get_stock_news(ticker: str, limit: int = 5) -> dict:
@@ -255,8 +255,8 @@ def get_stock_news(ticker: str, limit: int = 5) -> dict:
                 "publisher": item.get("publisher", ""),
                 "link": item.get("link", ""),
                 "published_at": datetime.fromtimestamp(
-                    item.get("providerPublishTime", 0)
-                ).strftime("%Y-%m-%d %H:%M") if item.get("providerPublishTime") else "",
+                    item.get("providerPublishTime", 0), tz=timezone.utc
+                ).strftime("%Y-%m-%d %H:%M UTC") if item.get("providerPublishTime") else "",
                 "summary": item.get("summary", ""),
             })
 
